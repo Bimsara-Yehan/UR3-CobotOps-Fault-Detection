@@ -21,5 +21,10 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# Node / frontend (React + Vite)
+node_modules/
+dist/
+.vite/
+
 # NOTE: data/raw/ is intentionally NOT ignored — the dataset is small and
 # must stay tracked in git as evidence for grading.

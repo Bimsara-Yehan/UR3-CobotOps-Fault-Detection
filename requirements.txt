@@ -9,7 +9,6 @@ shap==0.46.0
 joblib==1.4.2
 fastapi==0.115.0
 uvicorn==0.31.0
-streamlit==1.39.0
 jupyter==1.1.1
 openpyxl==3.1.5
 python-multipart==0.0.12

@@ -58,7 +58,7 @@ Each member owns one lane that runs through every checkpoint, so their Eval 1 wo
 | --- | --- | --- | --- | --- | --- |
 | **Meegasthanna** | Data quality + evaluation | Structure, types, missing values, duplicates, target and class imbalance | Logistic Regression; Dummy baseline; metric framework (why PR-AUC, not accuracy) | Input validation rules + system test cases | Intro, problem, stakeholders, dataset, data understanding |
 | **Bandara** (lead) | Time, leakage + validation | Timestamp and cycle analysis, event-window leakage study, split strategy | XGBoost/LightGBM; shared CV harness; cross-model comparison and final selection | Backend API (FastAPI), model loading | Leakage, validation strategy, final selection, system architecture |
-| **Seneviratne** | Patterns + interpretation | Distributions, outliers, correlations, class-conditional comparisons, grip\_lost analysis | Random Forest; feature importance, SHAP, feature-selection experiments | Frontend (Streamlit): inputs, result card, explanation | EDA, feature selection, model interpretation |
+| **Seneviratne** | Patterns + interpretation | Distributions, outliers, correlations, class-conditional comparisons, grip\_lost analysis | Random Forest; feature importance, SHAP, feature-selection experiments | Frontend (React): inputs, result card, explanation | EDA, feature selection, model interpretation |
 | **Umer** | Preprocessing + imbalance | Imputation, scaling, encoding, feature engineering, `src/pipeline.py` | SVM (RBF); class weights vs SMOTE; decision-threshold tuning | Final pipeline packaging, prediction messages | Preprocessing, feature engineering, imbalance handling, tuning |
 
 Why this split works for grading:
@@ -170,11 +170,11 @@ The decision-log cells (see each Evaluation section above) are the raw material 
 
 ## System build (1–5 Oct)
 
-The system is a FastAPI backend that loads `final_pipeline.joblib`, plus a Streamlit frontend. Both are simple to build and demo, and preprocessing can't drift because the backend reuses the saved pipeline.
+The system is a FastAPI backend that loads `final_pipeline.joblib`, plus a React (Vite) frontend. Preprocessing can't drift because the backend reuses the saved pipeline.
 
 ```mermaid
 flowchart LR
-  U["Operator /<br/>engineer"] --> F["Streamlit UI<br/>inputs + result card"]
+  U["Operator /<br/>engineer"] --> F["React UI<br/>inputs + result card"]
   F -->|JSON| B["FastAPI /predict<br/>validate inputs"]
   B --> P["final_pipeline.joblib<br/>preprocess + model"]
   P --> B
@@ -261,5 +261,5 @@ Four rules prevent most group-project failures here: one repo, one data loader, 
 - [ ] Framing: detection only, or detection as a baseline plus early warning (stop within the next k rows)? Decide by 24 Sep, based on notebook 03.
 - [ ] Split: StratifiedGroupKFold by cycle, or a chronological split? Decide by 24 Sep, based on notebook 03.
 - [ ] Boosting library: XGBoost or LightGBM?
-- [ ] Frontend: Streamlit, or a custom HTML/React page if the team wants a more polished demo?
+- [x] Frontend: **React (Vite)**, chosen over Streamlit for a more polished demo. Adds a Node/npm toolchain and a CORS step on the backend — budget a bit more setup time for this than Streamlit would have needed.
 - [ ] Do the lane assignments above suit everyone's strengths?

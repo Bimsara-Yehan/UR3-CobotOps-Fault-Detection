@@ -1,0 +1,25 @@
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment variables / secrets
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# NOTE: data/raw/ is intentionally NOT ignored — the dataset is small and
+# must stay tracked in git as evidence for grading.

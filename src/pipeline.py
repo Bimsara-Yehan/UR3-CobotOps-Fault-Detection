@@ -10,6 +10,8 @@ def load_data(path=RAW_DATA_PATH, sheet_name=RAW_DATA_SHEET):
     df = pd.read_excel(path, sheet_name=sheet_name)
     df.columns = df.columns.str.strip()
     df = df.loc[:, ~df.columns.str.startswith("Unnamed")]
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+    df["Timestamp"] = pd.to_datetime(
+        df["Timestamp"].astype(str).str.strip('"'), format="ISO8601"
+    )
     return df
 

@@ -12,5 +12,7 @@
   "Temperature_J4",
   "Temperature_J5",
   "Tool_current",
-  "grip_lost"
+  "grip_lost",
+  "total_joint_current",
+  "total_joint_current_delta3"
 ]

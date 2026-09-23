@@ -3,6 +3,22 @@ import "./App.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
+// Illustrative layout data only -- NOT real feature attribution. Notebook 07
+// (SHAP/permutation importance) hasn't run yet, and the backend doesn't return
+// per-feature contributions. Replace this with real values once it does.
+const PLACEHOLDER_TOP_FEATURES = {
+  positive: [
+    { name: "Elbow Current (J2)", pct: 88, val: "+0.45", band: "h" },
+    { name: "Shoulder Current (J1)", pct: 65, val: "+0.32", band: "h" },
+    { name: "Wrist Temp (J4)", pct: 42, val: "+0.15", band: "m" },
+  ],
+  negative: [
+    { name: "Elbow Current (J2)", pct: 18, val: "-0.18", band: "l" },
+    { name: "Shoulder Current (J1)", pct: 12, val: "-0.09", band: "l" },
+    { name: "Wrist Temp (J4)", pct: 8, val: "-0.04", band: "l" },
+  ],
+};
+
 const PRESETS = {
   normal: {
     label: "Safe Normal Run",
@@ -232,7 +248,7 @@ function App() {
                 </div>
                 <div className="field grip-field">
                   <label className="field-label" htmlFor="grip_lost">Workpiece Grip Status</label>
-                  <label className="toggle" htmlFor="grip_lost">
+                  <label className="toggle-switch" htmlFor="grip_lost">
                     <input type="checkbox" id="grip_lost" checked={formData.grip_lost}
                       onChange={e => handleChange("grip_lost", e.target.checked)} />
                     <span className="toggle-track" />
@@ -323,13 +339,15 @@ function App() {
               <div className="shap-card">
                 <div className="shap-header">
                   <span>Top Signal Contributors</span>
-                  <span className="shap-tag">SHAP</span>
+                  <span className="shap-tag shap-tag--placeholder" title="Illustrative layout only. Real SHAP values are computed in notebook 07 (feature interpretation, not done yet) and are not wired into this API response.">
+                    PLACEHOLDER
+                  </span>
                 </div>
-                {[
-                  { name: "Elbow Current (J2)", pct: result.label === 1 ? 88 : 18, val: result.label === 1 ? "+0.45" : "−0.18", band: result.label === 1 ? "h" : "l" },
-                  { name: "Shoulder Current (J1)", pct: result.label === 1 ? 65 : 12, val: result.label === 1 ? "+0.32" : "−0.09", band: result.label === 1 ? "h" : "l" },
-                  { name: "Wrist Temp (J4)", pct: result.label === 1 ? 42 : 8, val: result.label === 1 ? "+0.15" : "−0.04", band: result.label === 1 ? "m" : "l" },
-                ].map(s => (
+                <p className="shap-placeholder-note">
+                  Example layout only — not the model's real feature attribution. Will be replaced once notebook 07 (SHAP/permutation importance) is done and the backend returns real per-feature contributions.
+                </p>
+                {/* Illustrative values only, not computed from `result` or any real explainability output. */}
+                {PLACEHOLDER_TOP_FEATURES[result.label === 1 ? "positive" : "negative"].map(s => (
                   <div className="shap-row" key={s.name}>
                     <span className="shap-name">{s.name}</span>
                     <div className="shap-bar-bg">

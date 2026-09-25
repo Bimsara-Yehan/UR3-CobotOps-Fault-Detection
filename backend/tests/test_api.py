@@ -124,9 +124,16 @@ def test_risk_band_edges(bundle, probability, band):
 
 
 def test_boundary_inputs_are_accepted(client):
-    zeros = {"current": {k: 0.0 for k in RAW_FEATURES}, "earlier": {k: 0.0 for k in CURRENT_COLS}}
-    extreme = {"current": {k: 1e3 for k in RAW_FEATURES}, "earlier": {k: -1e3 for k in CURRENT_COLS}}
-    for body in (zeros, extreme):
+    """Values at zero and exactly at the physical limits should be accepted (not out-of-range)."""
+    all_zeros = {"current": {"Current_J0": 0.0, "Current_J1": 0.0, "Current_J2": 0.0,
+                             "Current_J3": 0.0, "Current_J4": 0.0, "Current_J5": 0.0,
+                             "Tool_current": 0.0},
+                 "earlier": {f"Current_J{i}": 0.0 for i in range(6)}}
+    at_joint_max = {"current": {"Current_J0": 10.0, "Current_J1": -10.0, "Current_J2": 10.0,
+                                "Current_J3": -10.0, "Current_J4": 10.0, "Current_J5": -10.0,
+                                "Tool_current": 3.0},
+                   "earlier": {f"Current_J{i}": 10.0 for i in range(6)}}
+    for body in [all_zeros, at_joint_max]:
         response = client.post("/predict", json=body)
         assert response.status_code == 200
         assert 0.0 <= response.json()["probability"] <= 1.0
@@ -175,6 +182,29 @@ def test_non_finite_numbers_are_rejected(client, raw):
 def test_empty_body_and_bad_json_do_not_crash(client):
     assert client.post("/predict").status_code == 422
     assert client.post("/predict", content="not json", headers={"Content-Type": "application/json"}).status_code == 422
+
+
+@pytest.mark.parametrize("section", ["current", "earlier"])
+@pytest.mark.parametrize("value, ok", [(10.0, True), (-10.0, True), (10.01, False), (-10.01, False)])
+def test_joint_current_bounds(client, section, value, ok):
+    """Joint current: exactly at ±10.0 A is accepted; beyond that is rejected with 422."""
+    body = _with(VALID, section, "Current_J2", value)
+    response = client.post("/predict", json=body)
+    assert (response.status_code == 200) is ok
+    if not ok:
+        detail = response.json()["detail"]
+        # Error must name the field; it must NOT echo the invalid numeric value in the message text or detail keys.
+        locs = [d["loc"] for d in detail]
+        assert any("Current_J2" in loc for loc in locs)
+        assert all("input" not in d for d in detail)
+
+
+@pytest.mark.parametrize("value, ok", [(0.0, True), (3.0, True), (3.01, False), (-0.01, False)])
+def test_tool_current_bounds(client, value, ok):
+    """Tool current: [0.0, 3.0] A is accepted; outside that range is rejected with 422."""
+    body = _with(VALID, "current", "Tool_current", value)
+    response = client.post("/predict", json=body)
+    assert (response.status_code == 200) is ok
 
 
 def test_missing_model_gives_503(monkeypatch, tmp_path):

@@ -28,7 +28,26 @@ Run each notebook top to bottom (*Restart & Run All*) before committing. Shared 
 uvicorn backend.main:app --reload
 ```
 
-Serves `/predict` and `/health`, loading `models/final_pipeline.joblib` once at startup.
+Serves `/predict`, `/model-info` and `/health`, loading `models/final_pipeline.joblib` once at startup.
+
+The model uses how much the total joint current changed over the last 3 readings, so `/predict` takes the latest reading plus the joint currents from the reading 3 steps earlier in the same working cycle (the API cannot check that the two are consecutive):
+
+```json
+{
+  "current": {"Current_J0": 0.084, "Current_J1": -1.692, "Current_J2": -0.724, "Current_J3": -0.694,
+              "Current_J4": -0.031, "Current_J5": 0.068, "Tool_current": 0.082},
+  "earlier": {"Current_J0": 0.129, "Current_J1": -1.975, "Current_J2": -0.999, "Current_J3": -0.574,
+              "Current_J4": -0.004, "Current_J5": -0.01}
+}
+```
+
+It returns the label, stop probability, risk band (low / medium / high), a message, the two thresholds, and the three inputs that moved the prediction most (SHAP). Invalid or missing inputs get a `422` that names the field.
+
+Tests (parity with the notebook on real test rows, validation, risk bands, explanations):
+
+```bash
+python -m pytest backend/tests
+```
 
 ## Running the frontend
 

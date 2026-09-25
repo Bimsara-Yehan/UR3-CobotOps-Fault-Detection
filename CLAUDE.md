@@ -191,7 +191,7 @@ The user enters sensor readings, or picks a sample row. The backend validates th
 | Frontend | Seneviratne | Grouped input form (current / temperature / speed / tool), load-sample button, result card, top-3 feature explanation | A non-technical person can run a prediction without help |
 | System testing | Meegasthanna (lead), all | Test table: valid, invalid, missing, boundary and known-positive cases, with expected vs actual results | Test evidence exported for the report |
 
-If the early-warning framing is chosen, the UI accepts a short window of recent readings (for example the last 3–5 rows as CSV) instead of a single row. Settle this on 1 October so the frontend is built only once.
+The deployed system already takes the latest reading plus the joint currents from the reading 3 steps earlier, because the trend feature needs them (notebook 07, section 3). A longer window of recent readings would only be needed if an early-warning framing were chosen (not recommended, see the open decision below).
 
 ## Technical report (due 6 Oct)
 
@@ -256,10 +256,10 @@ Four rules prevent most group-project failures here: one repo, one data loader, 
 
 ## Open decisions to confirm as a team
 
-- [ ] Which Eval 1 slot is ours: 23, 26 or 27 September? This sets how compressed the next two days are.
-- [ ] Do we have written evidence that the instructor approved the dataset (email, screenshot or sign-off)?
-- [ ] Framing: detection only, or detection as a baseline plus early warning (stop within the next k rows)? Decide by 24 Sep, based on notebook 03.
-- [ ] Split: StratifiedGroupKFold by cycle, or a chronological split? Decide by 24 Sep, based on notebook 03.
-- [ ] Boosting library: XGBoost or LightGBM?
+- [x] Which Eval 1 slot is ours: **27 September** (confirmed 25 Sep).
+- [x] Instructor approval of the dataset: **approved** (confirmed 25 Sep). Keep a copy of the written evidence for report section 3.
+- [ ] Framing: detection only, or detection as a baseline plus early warning (stop within the next k rows)? **Recommendation: detection.** Notebook 03's same-cycle-position control and notebook 07 section 10 (train only) find early warning statistically above chance but not practical (about 85-170 false-alarm runs per hour to warn 60-88% of stops). Decide at the 29 Sep meeting.
+- [x] Split: **chronological by cycle** (last 20% of cycles as the test set), with StratifiedGroupKFold by cycle for cross-validation inside train (notebook 03).
+- [x] Boosting library: **XGBoost** (notebook 07).
 - [x] Frontend: **React (Vite)**, chosen over Streamlit for a more polished demo. Adds a Node/npm toolchain and a CORS step on the backend — budget a bit more setup time for this than Streamlit would have needed.
 - [ ] Do the lane assignments above suit everyone's strengths?

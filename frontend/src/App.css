@@ -192,6 +192,7 @@
   font-size: 0.82rem;
   padding: 8px 34px 8px 10px;
 }
+.field-input--out { border-color: rgba(245,158,11,0.7); }
 .field-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
 
 .field-unit {
@@ -202,49 +203,6 @@
   font-family: var(--font-mono);
   pointer-events: none;
 }
-
-.effector-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px;
-  align-items: end;
-}
-
-@media (max-width: 520px) {
-  .effector-row { grid-template-columns: 1fr; }
-}
-
-.grip-field { align-items: flex-start; }
-
-/* Toggle switch */
-.toggle-switch {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-.toggle-switch input { position: absolute; opacity: 0; width: 0; height: 0; }
-.toggle-track {
-  position: relative;
-  width: 40px; height: 22px;
-  background: #334155;
-  border-radius: var(--radius-full);
-  transition: background 0.2s ease;
-  flex-shrink: 0;
-}
-.toggle-track::after {
-  content: '';
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 18px; height: 18px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
-}
-.toggle-switch input:checked + .toggle-track { background: var(--danger); }
-.toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
-.toggle-label { font-size: 0.78rem; color: var(--text-secondary); }
 
 /* ============================================================
    SUBMIT ROW
@@ -365,7 +323,6 @@
 .prob-fill.pf-low    { background: var(--success); }
 .prob-fill.pf-medium { background: var(--warning); }
 .prob-fill.pf-high   { background: var(--danger); }
-.prob-labels { display: flex; justify-content: space-between; font-size: 0.62rem; color: var(--text-muted); }
 
 .directive {
   background: rgba(0,0,0,0.2);
@@ -408,22 +365,6 @@
   color: #a5b4fc;
   border: 1px solid rgba(99,102,241,0.35);
 }
-.shap-tag--placeholder {
-  background: rgba(148,163,184,0.12);
-  color: var(--text-muted);
-  border-color: var(--border-subtle);
-  cursor: help;
-}
-
-.shap-placeholder-note {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin: 0 0 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px dashed var(--border-subtle);
-}
-
 .shap-row {
   display: grid;
   grid-template-columns: 1fr 2fr auto;
@@ -498,3 +439,49 @@
 
 .modal-foot { padding: 16px 20px; border-top: 1px solid var(--border-subtle); }
 .modal-foot .btn-run { width: 100%; }
+
+/* ============================================================
+   RANGE HINTS, NOTES AND PROBABILITY MARKERS
+   ============================================================ */
+.field-range { font-size: 0.6rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+.field-note {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 10px 0 0;
+}
+
+.range-note {
+  font-size: 0.74rem;
+  color: #fbbf24;
+  background: var(--warning-bg);
+  border: 1px solid rgba(245,158,11,0.35);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin: 16px 0 0;
+  line-height: 1.5;
+}
+
+.prob-bar { position: relative; }
+.prob-tick {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--text-secondary);
+  opacity: 0.7;
+  transform: translateX(-1px);
+}
+.prob-scale { position: relative; height: 16px; font-size: 0.62rem; color: var(--text-muted); }
+.prob-scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+.shap-note {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+.shap-input { display: block; font-family: var(--font-mono); font-size: 0.64rem; color: var(--text-muted); }

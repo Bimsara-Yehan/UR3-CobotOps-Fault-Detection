@@ -6,8 +6,12 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from src.features import LAG_ROWS
 
-# Sensor readings must be real numbers: NaN and infinity are rejected instead of being imputed silently.
-Reading = Annotated[float, Field(allow_inf_nan=False)]
+# Physical sanity bounds — wide headroom around the observed training range so typos and unit mistakes
+# are caught before reaching the model.  These are not from a UR3 datasheet; they are round numbers
+# chosen to sit well outside the data (joint currents -6.25 to 6.47 A, tool current 0.07 to 0.60 A).
+# The UI warns the operator when values are outside the training range.
+JointCurrent = Annotated[float, Field(ge=-10.0, le=10.0, allow_inf_nan=False, description="Joint motor current in amps")]
+ToolCurrent = Annotated[float, Field(ge=0.0, le=3.0, allow_inf_nan=False, description="Tool current in amps")]
 
 
 class CurrentReading(BaseModel):
@@ -15,13 +19,13 @@ class CurrentReading(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    Current_J0: Reading
-    Current_J1: Reading
-    Current_J2: Reading
-    Current_J3: Reading
-    Current_J4: Reading
-    Current_J5: Reading
-    Tool_current: Reading
+    Current_J0: JointCurrent
+    Current_J1: JointCurrent
+    Current_J2: JointCurrent
+    Current_J3: JointCurrent
+    Current_J4: JointCurrent
+    Current_J5: JointCurrent
+    Tool_current: ToolCurrent
 
 
 class EarlierCurrents(BaseModel):
@@ -29,12 +33,12 @@ class EarlierCurrents(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    Current_J0: Reading
-    Current_J1: Reading
-    Current_J2: Reading
-    Current_J3: Reading
-    Current_J4: Reading
-    Current_J5: Reading
+    Current_J0: JointCurrent
+    Current_J1: JointCurrent
+    Current_J2: JointCurrent
+    Current_J3: JointCurrent
+    Current_J4: JointCurrent
+    Current_J5: JointCurrent
 
 
 class PredictionRequest(BaseModel):

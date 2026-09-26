@@ -11,6 +11,8 @@ A protective-stop classifier for the UR3 cobot, built on the UCI CobotOps datase
 
 ## Setup
 
+**Prerequisites:** Python **3.11** (tested from a clean install; the pinned `numpy==1.26.4` has no prebuilt wheel for Python 3.13) and Node.js 18 or newer for the frontend. On Windows, clone into a short path (for example `C:\dev\`): a very long folder path can make `pip install` fail with a long-path error.
+
 ```bash
 # 1. Create and activate a virtual environment
 python -m venv venv

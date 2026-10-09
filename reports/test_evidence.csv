@@ -1,0 +1,14 @@
+Category,Case,Input,Expected,Actual,Result
+Known-positive,"real test-set row, ground truth = stop (row 28)",reading + history from test.parquet row 28,"200, label=1, p=0.932408 (matches notebook pipeline)","HTTP 200: label=1, p=0.932408, band=high",PASS
+Known-positive,"real test-set row, ground truth = stop (row 55)",reading + history from test.parquet row 55,"200, label=1, p=0.950432 (matches notebook pipeline)","HTTP 200: label=1, p=0.950432, band=high",PASS
+Known-positive,"real test-set row, ground truth = stop (row 56)",reading + history from test.parquet row 56,"200, label=1, p=0.969895 (matches notebook pipeline)","HTTP 200: label=1, p=0.969895, band=high",PASS
+Valid,"real test-set row, ground truth = normal (row 3)",reading + history from test.parquet row 3,"200, label=0, p=0.001409 (matches notebook pipeline)","HTTP 200: label=0, p=0.001409, band=low",PASS
+Valid,"real test-set row, ground truth = normal (row 4)",reading + history from test.parquet row 4,"200, label=0, p=0.000774 (matches notebook pipeline)","HTTP 200: label=0, p=0.000774, band=low",PASS
+Invalid,joint current beyond physical range (99 A),Current_J0 = 99.0,"422, field named, value not echoed",HTTP 422: current.Current_J0: Input should be less than or equal to 10,PASS
+Invalid,non-finite value (NaN),Current_J0 = NaN,422 (not a 500 crash),HTTP 422: current.Current_J0: Input should be a finite number,PASS
+Missing,required field omitted (Current_J2),current.Current_J2 absent,"422, names the missing field",HTTP 422: current.Current_J2: Field required,PASS
+Missing,empty request body,{},422,HTTP 422: current: Field required; earlier: Field required,PASS
+Boundary,joint current exactly at +10 A limit,Current_J0 = 10.0,200 (accepted),HTTP 200: label=0,PASS
+Boundary,joint current exactly at -10 A limit,Current_J0 = -10.0,200 (accepted),HTTP 200: label=0,PASS
+Boundary,joint current just beyond limit (10.01 A),Current_J0 = 10.01,422 (rejected),HTTP 422: current.Current_J0: Input should be less than or equal to 10,PASS
+Missing model,model file absent at startup,N/A (MODEL_PATH points nowhere),"503, health reports model_loaded=false","HTTP 503: health.model_loaded=False, predict -> 503",PASS

@@ -258,7 +258,7 @@ Four rules prevent most group-project failures here: one repo, one data loader, 
 
 - [x] Which Eval 1 slot is ours: **27 September** (confirmed 25 Sep).
 - [x] Instructor approval of the dataset: **approved** (confirmed 25 Sep). Keep a copy of the written evidence for report section 3.
-- [ ] Framing: detection only, or detection as a baseline plus early warning (stop within the next k rows)? **Recommendation: detection.** Notebook 03's same-cycle-position control and notebook 07 section 10 (train only) find early warning statistically above chance but not practical (about 85-170 false-alarm runs per hour to warn 60-88% of stops). Decide at the 29 Sep meeting.
+- [x] Framing: **detection** (confirmed 9 Oct), not early warning. Notebook 03's same-cycle-position control and notebook 07 section 10 (train only) found early warning statistically above chance but not practical (about 85-170 false-alarm runs per hour to warn 60-88% of stops). The system detects a protective stop at or near its onset; it does not predict one several rows ahead. State this scope explicitly in the report and the presentation's "honest catch" segment.
 - [x] Split: **chronological by cycle** (last 20% of cycles as the test set), with StratifiedGroupKFold by cycle for cross-validation inside train (notebook 03).
 - [x] Boosting library: **XGBoost** (notebook 07).
 - [x] Frontend: **React (Vite)**, chosen over Streamlit for a more polished demo. Adds a Node/npm toolchain and a CORS step on the backend — budget a bit more setup time for this than Streamlit would have needed.

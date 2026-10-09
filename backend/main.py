@@ -56,6 +56,11 @@ def _validate_bundle(bundle):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Load models/final_pipeline.joblib once at startup and build the SHAP explainer from it.
+
+    If the file is missing, the app still starts (so /health can report the problem) but every
+    other endpoint responds 503 until a valid model is placed at MODEL_PATH and the app restarts.
+    """
     if MODEL_PATH.exists():
         bundle = joblib.load(MODEL_PATH)
         _validate_bundle(bundle)
@@ -69,9 +74,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="UR3 CobotOps - Protective Stop Risk API", lifespan=lifespan)
 
+# The frontend dev server is Vite, which falls back to the next free port (5174, 5175, ...) if 5173
+# is already taken on the demo machine, so any localhost/127.0.0.1 port is allowed rather than hard-coding
+# one. This is safe only because the API is for local/demo use and is never exposed beyond localhost.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -102,6 +110,7 @@ def build_feature_row(request: PredictionRequest, features) -> pd.DataFrame:
 
 
 def risk_band(probability: float, threshold: float) -> str:
+    """Map a probability to "low"/"medium"/"high" using the model's alert threshold and WATCH_THRESHOLD."""
     if probability >= threshold:
         return "high"
     if probability >= WATCH_THRESHOLD:
@@ -126,18 +135,21 @@ def top_factors(pipeline, explainer, X: pd.DataFrame, n: int = TOP_FACTORS) -> l
     ]
 
 
-@app.get("/health", response_model=HealthResponse)
+@app.get("/health", response_model=HealthResponse, summary="Liveness and model-loaded check")
 def health():
+    """Report whether the process is up and whether the model bundle loaded successfully at startup."""
     return HealthResponse(status="ok", model_loaded="pipeline" in model_bundle)
 
 
 def _require_model():
+    """Raise 503 instead of a 500 or a crash when the model bundle failed to load at startup."""
     if "pipeline" not in model_bundle:
         raise HTTPException(status_code=503, detail="Model not loaded: models/final_pipeline.joblib is missing.")
 
 
-@app.get("/model-info", response_model=ModelInfoResponse)
+@app.get("/model-info", response_model=ModelInfoResponse, summary="Active model's features and thresholds")
 def model_info():
+    """Report the loaded model's feature list and its watch/alert thresholds, so a client can self-configure."""
     _require_model()
     return ModelInfoResponse(
         features=model_bundle["features"],
@@ -146,8 +158,13 @@ def model_info():
     )
 
 
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/predict", response_model=PredictionResponse, summary="Protective-stop risk for one reading")
 def predict(request: PredictionRequest):
+    """Score one reading plus its 3-reading history and return a label, probability, risk band and message.
+
+    Builds the model's input features with the same code path training used (src.features), so the
+    model is never asked to score a feature set it was not evaluated on.
+    """
     _require_model()
 
     pipeline = model_bundle["pipeline"]

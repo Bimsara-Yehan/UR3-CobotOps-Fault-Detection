@@ -90,6 +90,7 @@ def episode_metrics(y_true, y_pred, cycle, early_horizon=5, rows_per_hour=3600):
     episodes, alarms = find_runs(y, c), find_runs(p, c)
 
     def lead_start(s):
+        """First row of the early-warning window before episode onset `s` (same cycle only)."""
         lo = s
         while lo > max(s - early_horizon, 0) and c[lo - 1] == c[s]:
             lo -= 1
